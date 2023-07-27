@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload CSV File</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color:#f0f0f0;
+        }
+
+        h1 {
+            color: #333;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 90px;
+            width: fit-content;
+            padding :10px;
+            border-width: 15px;
+            border-style:solid;
+            margin: auto;
+            border-color: #4CAF50;
+        }
+
+        #uploadForm {
+            text-align: center;
+            margin: 20px auto;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .custom-file-upload {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+
+        #userInput {
+            display: block;
+            margin: 20px auto;
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        button {
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #responseMessage {
+            margin: 20px auto;
+            padding: 10px;
+            width: 80%;
+            min-height: 50px;
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI Data Analyst</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <label class="custom-file-upload" for="csvFile">Choose CSV File</label>
+        <input type="file" name="csvFile" id="csvFile">
+        <input type="button" value="Upload" onclick="uploadFile()">
+    </form>
+    <br>
+    <textarea name="userInput" id="userInput" rows="4" cols="50" placeholder="Enter your query here"></textarea>
+    <br>
+    <button onclick="processData()">Process Query</button>
+    <br>
+    <div id="responseMessage"></div>
+
+    
+    <script>
+        function uploadFile() {
+            const fileInput = document.getElementById('csvFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select a file.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('csvFile', file);
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '../cgi-bin/upload.py', true);
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    document.getElementById('responseMessage').innerText = xhr.responseText;
+                } else {
+                    document.getElementById('responseMessage').innerText = 'Error occurred while uploading the file.';
+                }
+            };
+
+            xhr.send(formData);
+        }
+                function processData() {
+            const userInput = document.getElementById('userInput').value;
+
+            const xhr = new XMLHttpRequest();
+            const url = `../cgi-bin/process.py?userInput=${encodeURIComponent(userInput)}`;
+            xhr.open('GET', url, true);
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    document.getElementById('responseMessage').innerText = xhr.responseText;
+                } else {
+                    document.getElementById('responseMessage').innerText = 'Error occurred while processing the query.';
+                }
+            };
+
+            xhr.send();
+        }
+    </script>
+</body>
+</html>
